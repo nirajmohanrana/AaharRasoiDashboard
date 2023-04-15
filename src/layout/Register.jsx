@@ -10,6 +10,7 @@ import { db, auth, storage } from "../firebase";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updatePhoneNumber,
   updateProfile,
 } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -22,6 +23,7 @@ function Register() {
   });
   const [rasoiImgUrl, setRasoiImgUrl] = useState(null);
   const [rasoiName, setRasoiName] = useState("");
+  const [rasoiPhone, setRasoiPhone] = useState("");
   const [rasoiMail, setRasoiMail] = useState("");
   const [rasoiPassword, setRasoiPassword] = useState("");
   const [addressLine1, setAddressLine1] = useState(null);
@@ -54,6 +56,7 @@ function Register() {
   async function handleCurrentLoacation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition);
+      console.log(navigator.geolocation);
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
@@ -61,6 +64,7 @@ function Register() {
 
   async function handleRegisterSubmit(e) {
     e.preventDefault();
+
     setIsLoading(true);
 
     createUserWithEmailAndPassword(auth, rasoiMail, rasoiPassword)
@@ -110,40 +114,29 @@ function Register() {
       updateProfile(auth.currentUser, {
         displayName: rasoiName,
         photoURL: rasoiImgUrl,
-      }).catch((err) => {
-        console.log("updateProfile err", err);
+      })
+        .then(() => {
+          updatePhoneNumber(auth.currentUser, rasoiPhone);
+        })
+        .catch((err) => {
+          console.log("updateProfile err", err);
+        });
+
+      setDoc(doc(db, "rasoi-users", auth.currentUser.uid), {
+        rasoiId: auth.currentUser.uid,
+        rasoiName: rasoiName,
+        rasoiPhone: rasoiPhone,
+        rasoiMail: rasoiMail,
+        rasoiLogo: rasoiImgUrl,
+        formattedAddress: `${addressLine1} ${addressLine2}`,
+        latitude: addressLoc.lat,
+        longitude: addressLoc.lng,
+        locality: addressLoc.locality,
+        city: addressLoc.city,
+        state: addressLoc.state,
+        country: addressLoc.area,
+        pincode: addressLoc.pincode,
       });
-
-      setDoc(
-        doc(
-          db,
-          "rasoi-users",
-          rasoiName + "-" + auth.currentUser.uid.slice(0, 11)
-        ),
-        {
-          rasoiId: auth.currentUser.uid,
-          rasoiName: rasoiName,
-          rasoiMail: rasoiMail,
-          rasoiLogo: rasoiImgUrl,
-          formattedAddress: `${addressLine1} ${addressLine2}`,
-          locality: addressLoc.locality,
-          city: addressLoc.city,
-          state: addressLoc.state,
-          country: addressLoc.area,
-          pincode: addressLoc.pincode,
-        }
-      );
-
-      setDoc(
-        doc(
-          db,
-          "food-items",
-          rasoiName + "-" + auth.currentUser.uid.slice(0, 11)
-        ),
-        {
-          rasoiId: auth.currentUser.uid,
-        }
-      );
     }
   }, [auth, formSubmitted, rasoiLogo]);
 
@@ -210,19 +203,40 @@ function Register() {
                   <div>
                     <label
                       className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                      htmlFor="dish-name"
+                      htmlFor="rasoi-name"
                     >
                       Rasoi Name
                     </label>
                     <input
                       className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                      id="dish-name"
+                      id="rasoi-name"
                       type="text"
                       value={rasoiName}
                       required
                       placeholder="Aahar ki Rasoi"
                       onChange={(e) => {
                         setRasoiName(e.target.value);
+                      }}
+                    />
+                  </div>
+
+                  {/* PHONE NUMBER */}
+                  <div>
+                    <label
+                      className="block uppercase tracking-wide text-gray-700 text-xs font-bold mt-4 mb-2"
+                      htmlFor="dish-name"
+                    >
+                      Rasoi Phone Number
+                    </label>
+                    <input
+                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      id="rasoi-phone"
+                      type="number"
+                      value={rasoiPhone}
+                      required
+                      placeholder="+91 98989 76767"
+                      onChange={(e) => {
+                        setRasoiPhone(e.target.value);
                       }}
                     />
                   </div>
@@ -235,7 +249,11 @@ function Register() {
                   </p>
                   <div className="flex flex-col justify-center items-center gap-1">
                     <img
-                      src={rasoiLogo.imageString ? rasoiLogo.imageString : ""}
+                      src={
+                        rasoiLogo.imageString
+                          ? rasoiLogo.imageString
+                          : "https://gdurl.com/Ffc1"
+                      }
                       alt={
                         rasoiLogo.file ? rasoiLogo.file.name : "Image Preview"
                       }
