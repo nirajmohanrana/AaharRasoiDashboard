@@ -64,6 +64,7 @@ function Register() {
 
   async function handleRegisterSubmit(e) {
     e.preventDefault();
+
     setIsLoading(true);
 
     createUserWithEmailAndPassword(auth, rasoiMail, rasoiPassword)
