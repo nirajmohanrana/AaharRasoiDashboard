@@ -22,8 +22,6 @@ function Menu({ rasoiUser }) {
     fetchFoodList();
   }, [setFoodList]);
 
-  console.log("foodList:", foodList);
-
   return (
     <>
       <div className="flex justify-between items-center">

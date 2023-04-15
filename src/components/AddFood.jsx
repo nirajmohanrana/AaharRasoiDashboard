@@ -1,4 +1,10 @@
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -13,6 +19,7 @@ function AddFood({ setAddVis, rasoiUser }) {
 
   const [formData, setFormData] = useState({
     dishName: "",
+    dishType: "veg",
     dishPrice: "",
     dishDesc: "",
   });
@@ -46,17 +53,14 @@ function AddFood({ setAddVis, rasoiUser }) {
 
   useEffect(() => {
     if (rasoiUser && formSubmitted && dishImgUrl) {
-      updateDoc(doc(db, "food-items", rasoiUser.id), {
-        foods: arrayUnion({
-          foodId: `${formData.dishName.replace(
-            /\s/g,
-            ""
-          )}-${rasoiUser.rasoiId.slice(0, 11)}`,
-          dishName: formData.dishName,
-          dishPrice: formData.dishPrice,
-          dishImgUrl: dishImgUrl,
-          dishDesc: formData.dishDesc,
-        }),
+      const rasoiUserDocRef = doc(db, "rasoi-users", rasoiUser.id);
+
+      addDoc(collection(rasoiUserDocRef, "food-items"), {
+        dishName: formData.dishName,
+        dishType: formData.dishType,
+        dishPrice: formData.dishPrice,
+        dishImgUrl: dishImgUrl,
+        dishDesc: formData.dishDesc,
       }).then(() => {
         alert(`${formData.dishName} has successfully uploaded`);
         setAddVis(false);
@@ -105,6 +109,7 @@ function AddFood({ setAddVis, rasoiUser }) {
                     onChange={(e) => {
                       setFormData({
                         dishName: e.target.value,
+                        dishType: formData.dishType,
                         dishPrice: formData.dishPrice,
                         dishDesc: formData.dishDesc,
                       });
@@ -112,8 +117,34 @@ function AddFood({ setAddVis, rasoiUser }) {
                   />
                 </div>
 
+                {/* NAME */}
+                <div>
+                  <label
+                    className="block uppercase tracking-wide text-gray-700 text-xs font-bold mt-5"
+                    htmlFor="dish-type"
+                  >
+                    Dish Type
+                  </label>
+                  <select
+                    id="dish-type"
+                    className="block w-full bg-gray-200 border-px text-gray-700 border border-gray-200 rounded py-2 px-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    required
+                    onChange={(e) => {
+                      setFormData({
+                        dishName: formData.dishName,
+                        dishType: e.target.value,
+                        dishPrice: formData.dishPrice,
+                        dishDesc: formData.dishDesc,
+                      });
+                    }}
+                  >
+                    <option value="veg">Veg</option>
+                    <option value="non-veg">Non Veg</option>
+                  </select>
+                </div>
+
                 {/* PRICE */}
-                <div className="mt-10">
+                <div className="mt-5">
                   <label
                     className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                     htmlFor="dish-price"
@@ -130,6 +161,7 @@ function AddFood({ setAddVis, rasoiUser }) {
                     onChange={(e) => {
                       setFormData({
                         dishName: formData.dishName,
+                        dishType: formData.dishType,
                         dishPrice: Math.abs(e.target.value),
                         dishDesc: formData.dishDesc,
                       });
@@ -145,7 +177,11 @@ function AddFood({ setAddVis, rasoiUser }) {
                 </p>
                 <div className="flex flex-col justify-center items-center gap-1">
                   <img
-                    src={dishImg.imageString ? dishImg.imageString : ""}
+                    src={
+                      dishImg.imageString
+                        ? dishImg.imageString
+                        : "https://gdurl.com/xBWU"
+                    }
                     alt={dishImg.file ? dishImg.file.name : "Image Preview"}
                     className="h-40 w-full object-cover"
                   />
@@ -194,6 +230,7 @@ function AddFood({ setAddVis, rasoiUser }) {
                   onChange={(e) => {
                     setFormData({
                       dishName: formData.dishName,
+                      dishType: formData.dishType,
                       dishPrice: formData.dishPrice,
                       dishDesc: e.target.value,
                     });
