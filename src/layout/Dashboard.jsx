@@ -36,6 +36,10 @@ function Dashboard() {
   }
 
   useEffect(() => {
+    if (auth.currentUser && !auth.currentUser.emailVerified) {
+      alert("PLEASE VERIFY YOUR ACCOUNT");
+    }
+
     const authChange = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const q = query(collection(db, "rasoi-users"));
@@ -73,7 +77,7 @@ function Dashboard() {
                       "https://cdn.iconscout.com/icon/premium/png-256-thumb/account-157-425639.png"
                     }
                     alt={rasoiUser.rasoiName || "Aahar Kitchen"}
-                    className="w-14 aspect-square object-cover rounded-full border cursor-pointer"
+                    className="w-14 aspect-square object-contain rounded-full border cursor-pointer border-orange-500"
                   />
                   <div>
                     <h4 className="font-bold tracking-wide text-xl text-orange-600 cursor-pointer">
@@ -95,7 +99,20 @@ function Dashboard() {
                       <BiCurrentLocation />
                       <span>Address</span>
                     </button>
-                    <p className="text-sm">{rasoiUser.rasoiMail}</p>
+                    <p
+                      className={`${
+                        auth.currentUser.emailVerified
+                          ? "text-green-500 text-xs font-semibold"
+                          : "text-red-700 text-xs cursor-pointer animate-pulse font-bold"
+                      }`}
+                      title={`${
+                        auth.currentUser.emailVerified
+                          ? ""
+                          : "Please Verify Your Account"
+                      }`}
+                    >
+                      {rasoiUser.rasoiMail}
+                    </p>
                   </div>
                   <button title="Log Out">
                     <AiOutlineLogout

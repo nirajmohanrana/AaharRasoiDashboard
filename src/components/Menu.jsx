@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import FoodCard from "./FoodCard";
 import AddFood from "./AddFood";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  QuerySnapshot,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
 import { db } from "../firebase";
 
 function Menu({ rasoiUser }) {
@@ -10,16 +16,20 @@ function Menu({ rasoiUser }) {
   const [foodList, setFoodList] = useState([]);
 
   useEffect(() => {
-    const fetchFoodList = async () => {
-      const foodsSnap = await getDoc(doc(db, "food-items", rasoiUser.id));
-      if (foodsSnap.exists()) {
-        setFoodList(foodsSnap.data().foods);
-      } else {
-        console.log("No such document!");
-      }
-    };
+    const rasoiUserDocRef = doc(db, "rasoi-users", rasoiUser.id);
+    const q = query(collection(rasoiUserDocRef, "food-items"));
 
-    fetchFoodList();
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const foodItems = [];
+
+      querySnapshot.forEach((doc) => {
+        foodItems.push({ id: doc.id, ...doc.data() });
+      });
+
+      setFoodList(foodItems);
+    });
+
+    return unsubscribe;
   }, [setFoodList]);
 
   return (

@@ -71,9 +71,7 @@ function Register() {
       .then(async (userCredential) => {
         const storageRef = ref(
           storage,
-          `rasoi-users/${
-            rasoiName + "-" + userCredential.user.uid.slice(0, 11)
-          }/images/${rasoiLogo.file.name}`
+          `rasoi-users/${userCredential.user.uid}/images/${rasoiLogo.file.name}`
         );
 
         await uploadBytes(storageRef, rasoiLogo.file, rasoiLogo.file.type).then(
@@ -239,6 +237,9 @@ function Register() {
                         setRasoiPhone(e.target.value);
                       }}
                     />
+                    <span className="text-[10px] font-bold text-gray-600">
+                      please add country code (eg. +91)
+                    </span>
                   </div>
                 </div>
 
@@ -249,13 +250,9 @@ function Register() {
                   </p>
                   <div className="flex flex-col justify-center items-center gap-1">
                     <img
-                      src={
-                        rasoiLogo.imageString
-                          ? rasoiLogo.imageString
-                          : "https://gdurl.com/Ffc1"
-                      }
+                      src={rasoiLogo.imageString ? rasoiLogo.imageString : ""}
                       alt={
-                        rasoiLogo.file ? rasoiLogo.file.name : "Image Preview"
+                        rasoiLogo.file ? rasoiLogo.file.name : "Add Your Logo "
                       }
                       className="h-24 object-scale-down w-full"
                     />

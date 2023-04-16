@@ -22,17 +22,18 @@
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 *::-webkit-scrollbar-track {
-  background: #ffffff;
+  background: #f9741660;
+  border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb {
   background-color: #f97316;
   border-radius: 10px;
-  border: 3px solid #ffffff;
+  border: 2px solid #ffffff;
 }
 
 .background-animate {

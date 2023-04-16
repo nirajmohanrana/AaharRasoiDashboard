@@ -54,14 +54,19 @@ function AddFood({ setAddVis, rasoiUser }) {
   useEffect(() => {
     if (rasoiUser && formSubmitted && dishImgUrl) {
       const rasoiUserDocRef = doc(db, "rasoi-users", rasoiUser.id);
+      const foodRef = collection(rasoiUserDocRef, "food-items");
 
-      addDoc(collection(rasoiUserDocRef, "food-items"), {
+      addDoc(foodRef, {
         dishName: formData.dishName,
         dishType: formData.dishType,
         dishPrice: formData.dishPrice,
         dishImgUrl: dishImgUrl,
         dishDesc: formData.dishDesc,
-      }).then(() => {
+      }).then((docRef) => {
+        const foodItemRef = doc(foodRef, docRef.id);
+        updateDoc(foodItemRef, {
+          foodId: docRef.id,
+        }).then(() => console.log("updated"));
         alert(`${formData.dishName} has successfully uploaded`);
         setAddVis(false);
       });
@@ -127,7 +132,19 @@ function AddFood({ setAddVis, rasoiUser }) {
                   </label>
                   <select
                     id="dish-type"
-                    className="block w-full bg-gray-200 border-px text-gray-700 border border-gray-200 rounded py-2 px-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    className={`block w-full 
+                    ${
+                      formData.dishType === "veg"
+                        ? `bg-green-400`
+                        : "bg-red-400"
+                    }
+                    border-px text-gray-700 font-semibold border border-gray-200 rounded py-2 px-2 leading-tight focus:outline-none
+                    ${
+                      formData.dishType === "veg"
+                        ? `focus:bg-green-300`
+                        : "focus:bg-red-300"
+                    }
+                    focus:border-gray-500`}
                     required
                     onChange={(e) => {
                       setFormData({
@@ -177,12 +194,8 @@ function AddFood({ setAddVis, rasoiUser }) {
                 </p>
                 <div className="flex flex-col justify-center items-center gap-1">
                   <img
-                    src={
-                      dishImg.imageString
-                        ? dishImg.imageString
-                        : "https://gdurl.com/xBWU"
-                    }
-                    alt={dishImg.file ? dishImg.file.name : "Image Preview"}
+                    src={dishImg.imageString ? dishImg.imageString : ""}
+                    alt={dishImg.file ? dishImg.file.name : "Add Dish Image"}
                     className="h-40 w-full object-cover"
                   />
                   <label className="border border-orange-500 hover:border-transparent hover:bg-orange-500 transition-all duration-700 cursor-pointer w-full text-center rounded-md text-orange-500 hover:text-white">
