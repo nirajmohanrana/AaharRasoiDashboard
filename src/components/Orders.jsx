@@ -1,7 +1,7 @@
 import React from "react";
 import OrderCard from "./OrderCard";
 
-function Orders() {
+function Orders({ orders }) {
   return (
     <>
       <div className="flex justify-between items-center">
@@ -10,7 +10,9 @@ function Orders() {
         </h4>
       </div>
       <div className="p-4">
-        <OrderCard />
+        {orders.map((order) => {
+          return <OrderCard order={order} />;
+        })}
       </div>
     </>
   );

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Route, Routes, useNavigate } from "react-router-dom";
 
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
 import AppBar from "../components/AppBar";
 import Menu from "../components/Menu";
@@ -22,6 +22,7 @@ function Dashboard() {
   const res = Restaurants[0];
 
   const [rasoiUser, setRasoiUser] = useState(null);
+  const [orders, setOrders] = useState(null);
 
   const navigate = useNavigate();
 
@@ -52,8 +53,26 @@ function Dashboard() {
 
           const userData = usersData.find((u) => u.rasoiId === user.uid);
           setRasoiUser(userData);
-          return unsubscribe;
         });
+
+        const ordersRef = collection(db, "orders");
+        const qOrders = query(ordersRef, where("rasoiId", "==", user.uid));
+
+        const unsubscribeOrders = onSnapshot(qOrders, (querySnapshot) => {
+          const ordersData = [];
+
+          querySnapshot.forEach((doc) => {
+            ordersData.push({ id: doc.id, ...doc.data() });
+          });
+
+          setOrders(ordersData);
+        });
+
+        return () => {
+          unsubscribe();
+          unsubscribeOrders();
+        };
+        //
       } else {
         handleLogOut();
       }
@@ -128,8 +147,11 @@ function Dashboard() {
                   path="/menu"
                   element={<Menu res={res} rasoiUser={rasoiUser} />}
                 />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/order-history" element={<OrderHistory />} />
+                <Route path="/orders" element={<Orders orders={orders} />} />
+                <Route
+                  path="/order-history"
+                  element={<OrderHistory orders={orders} />}
+                />
               </Routes>
             </div>
           </div>

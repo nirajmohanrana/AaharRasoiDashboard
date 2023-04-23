@@ -9,9 +9,7 @@ function OrderHistory() {
           Previous Orders
         </h4>
       </div>
-      <div className="p-4">
-        <OrderCard />
-      </div>
+      <div className="p-4">{/* <OrderCard /> */}</div>
     </>
   );
 }
