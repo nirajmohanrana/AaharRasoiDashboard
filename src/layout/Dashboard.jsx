@@ -23,6 +23,7 @@ function Dashboard() {
 
   const [rasoiUser, setRasoiUser] = useState(null);
   const [orders, setOrders] = useState(null);
+  const [ordersHistory, setOrdersHistory] = useState(null);
 
   const navigate = useNavigate();
 
@@ -56,7 +57,11 @@ function Dashboard() {
         });
 
         const ordersRef = collection(db, "orders");
-        const qOrders = query(ordersRef, where("rasoiId", "==", user.uid));
+        const qOrders = query(
+          ordersRef,
+          where("rasoiId", "==", user.uid),
+          where("orderStatus", "<", 4)
+        );
 
         const unsubscribeOrders = onSnapshot(qOrders, (querySnapshot) => {
           const ordersData = [];
@@ -68,9 +73,29 @@ function Dashboard() {
           setOrders(ordersData);
         });
 
+        const qOrdersHistory = query(
+          ordersRef,
+          where("rasoiId", "==", user.uid),
+          where("orderStatus", "==", 4)
+        );
+
+        const unsubscribeOrdersHistory = onSnapshot(
+          qOrdersHistory,
+          (querySnapshot) => {
+            const ordersHistoryData = [];
+
+            querySnapshot.forEach((doc) => {
+              ordersHistoryData.push({ id: doc.id, ...doc.data() });
+            });
+
+            setOrdersHistory(ordersHistoryData);
+          }
+        );
+
         return () => {
           unsubscribe();
           unsubscribeOrders();
+          unsubscribeOrdersHistory();
         };
         //
       } else {
@@ -150,7 +175,7 @@ function Dashboard() {
                 <Route path="/orders" element={<Orders orders={orders} />} />
                 <Route
                   path="/order-history"
-                  element={<OrderHistory orders={orders} />}
+                  element={<OrderHistory ordersHistory={ordersHistory} />}
                 />
               </Routes>
             </div>

@@ -1,7 +1,8 @@
 import React from "react";
 import OrderCard from "./OrderCard";
 
-function OrderHistory() {
+function OrderHistory({ ordersHistory }) {
+  console.log("ordersHistory YES", ordersHistory ? ordersHistory : "nhi");
   return (
     <>
       <div className="flex justify-between items-center">
@@ -9,7 +10,11 @@ function OrderHistory() {
           Previous Orders
         </h4>
       </div>
-      <div className="p-4">{/* <OrderCard /> */}</div>
+      <div className="p-4">
+        {ordersHistory.map((order) => {
+          return <OrderCard order={order} />;
+        })}
+      </div>
     </>
   );
 }

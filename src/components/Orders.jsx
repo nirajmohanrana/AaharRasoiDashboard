@@ -10,9 +10,11 @@ function Orders({ orders }) {
         </h4>
       </div>
       <div className="p-4">
-        {orders.map((order) => {
-          return <OrderCard order={order} />;
-        })}
+        {orders
+          ? orders.map((order) => {
+              return <OrderCard order={order} />;
+            })
+          : ""}
       </div>
     </>
   );

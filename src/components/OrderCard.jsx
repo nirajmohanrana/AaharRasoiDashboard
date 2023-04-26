@@ -18,7 +18,7 @@ function OrderCard({ order }) {
 
   return (
     <>
-      <div className="w-full border border-orange-500 rounded-md">
+      <div className="w-full border border-orange-500 rounded-md my-5">
         <div className="flex justify-between items-center p-2 border-b border-orange-500">
           <div>
             <div>
