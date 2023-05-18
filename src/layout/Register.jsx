@@ -37,8 +37,9 @@ function Register() {
   const showPosition = async (position) => {
     const { latitude, longitude } = position.coords;
 
-    const API_KEY2 = "9c695dcb7e9548551b27cded65f99721";
-    const API_KEY = "a3c6cf093facc41702836f520b0ba663";
+    //MAPMYINDIA APIs
+    const API_KEY2 = "";
+    const API_KEY = "";
     const url = `https://apis.mappls.com/advancedmaps/v1/9c695dcb7e9548551b27cded65f99721/rev_geocode?lat=${latitude}&lng=${longitude}`;
 
     try {
